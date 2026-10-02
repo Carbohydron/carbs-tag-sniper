@@ -16,7 +16,7 @@ local CLASS_SPELLS = {
     PRIEST  = { "Shadow Word: Pain", "Penance" },
     SHAMAN  = { "Earth Shock", "Flame Shock", "Frost Shock" },
     MAGE    = { "Fire Blast" },
-    WARLOCK = { "Curse of Agony" },
+    WARLOCK = { "Bane of Agony" },
     DRUID   = { "Moonfire", "Insect Swarm" },
 }
 
