@@ -1,4 +1,4 @@
-## Interface: 11507
+## Interface: 16001
 ## Title: CarbsTagSniper
 ## Notes: Maintains a macro that targets a named quest mob so you can snipe its tag on respawn.
 ## Author: Carb
