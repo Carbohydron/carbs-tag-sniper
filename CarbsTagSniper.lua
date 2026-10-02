@@ -76,49 +76,48 @@ local function SetCV(name, value)
     return SetCVar(name, value)
 end
 
--- The macro calls these around its /cast. Keeping the mute and raid-mark logic
--- here keeps the macro short and lets /cts mark and /cts quiet apply instantly.
-local mutedSpeech = false
+-- The player's error speech setting, captured at load so CTSPost can restore it.
+local speechPref = "1"
 
-function CTSPre()
-    if db and db.quiet and GetCV("Sound_EnableErrorSpeech") == "1" then
-        SetCV("Sound_EnableErrorSpeech", "0")
-        mutedSpeech = true
-    end
-end
-
+-- Called on the macro's last line. Addon code taints the rest of a macro run,
+-- so nothing protected (/cast, /startattack, SetRaidTarget) may come after it.
 function CTSPost()
-    if mutedSpeech then
-        SetCV("Sound_EnableErrorSpeech", "1")
-        mutedSpeech = false
-    end
-    if not db then return end
-    if db.quiet then UIErrorsFrame:Clear() end
-    -- Only set the mark when it is missing; SetRaidTarget every press is wasted traffic.
-    if db.mark and db.mark > 0 and GetRaidTargetIndex("target") ~= db.mark then
-        SetRaidTarget("target", db.mark)
-    end
+    if not db or not db.quiet then return end
+    SetCV("Sound_EnableErrorSpeech", speechPref)
+    UIErrorsFrame:Clear()
 end
 
--- Builds the macro text. #showtooltip is dropped if a very long mob or spell
--- name pushes it past the 255 char cap.
+-- Builds the macro text. Everything before the final /run is Blizzard code
+-- only, so the protected actions run untainted. Optional lines are dropped
+-- (#showtooltip first, then the raid mark) if long names pass the 255 char cap.
 local function BuildBody(target, spell)
-    local function lines(withTooltip)
+    local function lines(withTooltip, withMark)
         local out = {}
         if withTooltip then out[#out + 1] = "#showtooltip" end
         -- Clear first so a stale target can never be hit when the mob is not up.
         out[#out + 1] = "/cleartarget"
         out[#out + 1] = "/targetexact " .. target
-        out[#out + 1] = "/stopmacro [@target,noexists][@target,dead]"
-        out[#out + 1] = "/run CTSPre()"
+        out[#out + 1] = "/stopmacro [noexists][dead]"
+        if withMark and db.mark and db.mark > 0 then
+            -- Only set the mark when it is missing; re-setting every press is wasted traffic.
+            out[#out + 1] = ('/run if GetRaidTargetIndex"target"~=%d then SetRaidTarget("target",%d)end')
+                :format(db.mark, db.mark)
+        end
+        if db.quiet then out[#out + 1] = "/console Sound_EnableErrorSpeech 0" end
         if spell then out[#out + 1] = "/cast " .. spell end
         out[#out + 1] = "/startattack"
-        out[#out + 1] = "/run CTSPost()"
+        if db.quiet then out[#out + 1] = "/run CTSPost()" end
         return table.concat(out, "\n")
     end
 
-    local body = lines(true)
-    if #body > MACRO_MAX_CHARS then body = lines(false) end
+    local body = lines(true, true)
+    if #body > MACRO_MAX_CHARS then body = lines(false, true) end
+    if #body > MACRO_MAX_CHARS then
+        body = lines(false, false)
+        if #body <= MACRO_MAX_CHARS and db.mark and db.mark > 0 then
+            Print("names are long, so the raid mark line was left out of the macro.")
+        end
+    end
     if #body > MACRO_MAX_CHARS then return nil end
     return body
 end
@@ -198,6 +197,7 @@ frame:SetScript("OnEvent", function(self, event, arg1)
         for k, v in pairs(defaults) do
             if db[k] == nil then db[k] = v end
         end
+        speechPref = GetCV("Sound_EnableErrorSpeech") or "1"
         self:UnregisterEvent("ADDON_LOADED")
     elseif not db then
         return
@@ -248,11 +248,13 @@ SlashCmdList["CARBSTAGSNIPER"] = function(msg)
             return
         end
         Print("raid mark " .. (db.mark > 0 and tostring(db.mark) or "off") .. ".")
+        UpdateMacro(true)
     elseif cmd == "quiet" then
         if rest:lower() == "on" then db.quiet = true
         elseif rest:lower() == "off" then db.quiet = false
         else db.quiet = not db.quiet end
         Print("quiet " .. (db.quiet and "on" or "off") .. ".")
+        UpdateMacro(true)
     elseif cmd == "update" then
         UpdateMacro(true)
     elseif cmd == "show" then

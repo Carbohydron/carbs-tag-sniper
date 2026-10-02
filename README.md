@@ -34,8 +34,9 @@ Copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the
 #showtooltip
 /cleartarget
 /targetexact Rotting Dead
-/stopmacro [@target,noexists][@target,dead]
-/run CTSPre()
+/stopmacro [noexists][dead]
+/run if GetRaidTargetIndex"target"~=7 then SetRaidTarget("target",7)end
+/console Sound_EnableErrorSpeech 0
 /cast Fire Blast
 /startattack
 /run CTSPost()
@@ -43,9 +44,12 @@ Copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the
 
 - The target is cleared first, so if the mob isn't up (or is dead) the macro stops and does
   nothing, instead of firing at whatever you had targeted before.
-- `CTSPre`/`CTSPost` turn error speech off around the cast and restore it, clear the red
-  error text, and set the raid marker only when it is missing, so spamming stays silent and
-  doesn't resend the marker every press.
+- Error speech is muted with `/console` before the cast; `CTSPost` restores your setting and
+  clears the red error text. The raid marker is set only when it is missing, so spamming
+  doesn't resend it every press.
+- `CTSPost` is the only addon code in the macro and it must stay on the last line: addon code
+  taints the rest of the macro run, which gets `/cast` blocked ("blocked from an action only
+  available to the Blizzard UI").
 - The macro is only rewritten when its text actually changes, and never in combat (changes
   wait for combat to end).
 
