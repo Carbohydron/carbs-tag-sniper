@@ -79,16 +79,15 @@ end
 -- The player's error speech setting, captured at load so CTSPost can restore it.
 local speechPref = "1"
 
--- Called on the macro's last line. Addon code taints the rest of a macro run,
--- so nothing protected (/cast, /startattack, SetRaidTarget) may come after it.
+-- Called on the macro's last line. /run code is tainted on Forever, so it
+-- must only touch unprotected things (CVars, the error frame).
 function CTSPost()
     if not db or not db.quiet then return end
     SetCV("Sound_EnableErrorSpeech", speechPref)
     UIErrorsFrame:Clear()
 end
 
--- Builds the macro text. Everything before the final /run is Blizzard code
--- only, so the protected actions run untainted. Optional lines are dropped
+-- Builds the macro text. Optional lines are dropped
 -- (#showtooltip first, then the raid mark) if long names pass the 255 char cap.
 local function BuildBody(target, spell)
     local function lines(withTooltip, withMark)
@@ -99,9 +98,9 @@ local function BuildBody(target, spell)
         out[#out + 1] = "/targetexact " .. target
         out[#out + 1] = "/stopmacro [noexists][dead]"
         if withMark and db.mark and db.mark > 0 then
-            -- Only set the mark when it is missing; re-setting every press is wasted traffic.
-            out[#out + 1] = ('/run if GetRaidTargetIndex"target"~=%d then SetRaidTarget("target",%d)end')
-                :format(db.mark, db.mark)
+            -- /run is force-tainted on Forever (no loadstring_untainted), so the
+            -- protected SetRaidTarget must go through the secure /tm command.
+            out[#out + 1] = "/tm " .. db.mark
         end
         if db.quiet then out[#out + 1] = "/console Sound_EnableErrorSpeech 0" end
         if spell then out[#out + 1] = "/cast " .. spell end
