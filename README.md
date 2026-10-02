@@ -51,10 +51,11 @@ Copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the
 - The macro is only rewritten when its text actually changes, and never in combat (changes
   wait for combat to end).
 
-Default tag spells, first one your character knows: Warrior Heroic Throw, Paladin Judgment,
-Hunter Arcane Shot, Rogue Shuriken Toss/Throw, Priest Shadow Word: Pain, Death Knight Death
-Coil, Shaman Flame Shock, Mage Fire Blast, Warlock Corruption, Monk Provoke, Druid Moonfire,
-Demon Hunter Throw Glaive, Evoker Azure Strike. Override with `/cts spell`.
+Default tag spells are instant and deal damage. The first one your character knows is used:
+Paladin Holy Shock or Judgement, Hunter Arcane Shot or Serpent Sting, Priest Shadow Word: Pain,
+Shaman Earth/Flame/Frost Shock, Mage Fire Blast, Warlock Curse of Agony, Druid Moonfire or
+Insect Swarm. Warriors, Rogues, and anyone who hasn't learned one yet tag with melee through
+`/startattack`. Override with `/cts spell`.
 
 Errors the server reports after the cast (such as line of sight) arrive after speech is
 restored, so those can still make a sound.

@@ -5,22 +5,19 @@ local MACRO_ICON = "INV_MISC_QUESTIONMARK" -- lets #showtooltip pick the spell's
 local MACRO_MAX_CHARS = 255
 local DEFAULT_MARK = 7
 
--- Instant (or near-instant) ranged abilities that put a mob in combat with you.
--- The first one the character knows wins; /cts spell overrides this.
+-- Instant, damaging abilities that tag a mob. The first one the character
+-- knows wins; /cts spell overrides this. Classes with none (or characters that
+-- have not learned one yet) tag with melee via the macro's /startattack.
 local CLASS_SPELLS = {
-    WARRIOR     = { "Heroic Throw", "Charge", "Taunt" },
-    PALADIN     = { "Judgment", "Hand of Reckoning", "Avenger's Shield" },
-    HUNTER      = { "Arcane Shot", "Concussive Shot", "Steady Shot", "Auto Shot" },
-    ROGUE       = { "Shuriken Toss", "Throw", "Shoot" },
-    PRIEST      = { "Shadow Word: Pain", "Penance", "Holy Fire", "Smite" },
-    DEATHKNIGHT = { "Death Coil", "Howling Blast", "Icy Touch", "Death Grip", "Dark Command" },
-    SHAMAN      = { "Flame Shock", "Earth Shock", "Frost Shock", "Lightning Bolt" },
-    MAGE        = { "Fire Blast", "Ice Lance", "Frostbolt" },
-    WARLOCK     = { "Corruption", "Shadowburn", "Shadow Bolt" },
-    MONK        = { "Provoke", "Crackling Jade Lightning" },
-    DRUID       = { "Moonfire", "Sunfire", "Wrath" },
-    DEMONHUNTER = { "Throw Glaive", "Torment" },
-    EVOKER      = { "Azure Strike", "Living Flame" },
+    WARRIOR = {},
+    ROGUE   = {},
+    PALADIN = { "Holy Shock", "Judgement" },
+    HUNTER  = { "Arcane Shot", "Serpent Sting" },
+    PRIEST  = { "Shadow Word: Pain", "Penance" },
+    SHAMAN  = { "Earth Shock", "Flame Shock", "Frost Shock" },
+    MAGE    = { "Fire Blast" },
+    WARLOCK = { "Curse of Agony" },
+    DRUID   = { "Moonfire", "Insect Swarm" },
 }
 
 local defaults = {
@@ -159,14 +156,14 @@ local function UpdateMacro(verbose)
         Print("created character macro " .. MACRO_NAME .. ". Drag it from /macro to a bar or bind it.")
     end
     if not spell then
-        Print("no tagging spell found for your class; the macro only targets. Set one with /cts spell <name>.")
+        Print("no instant tag spell yet, so the macro tags with melee (/startattack). Set a spell with /cts spell <name>.")
     end
 end
 
 local function Status()
     Print(("mob: %s | spell: %s%s | mark: %s | quiet: %s"):format(
         db.target or "|cffff6060not set|r",
-        CurrentSpell() or "|cffff6060none|r",
+        CurrentSpell() or "melee",
         db.spell and " (manual)" or " (class default)",
         (db.mark and db.mark > 0) and tostring(db.mark) or "off",
         db.quiet and "on" or "off"))
@@ -229,7 +226,7 @@ SlashCmdList["CARBSTAGSNIPER"] = function(msg)
             Print("spell: " .. (CurrentSpell() or "none"))
         elseif rest:lower() == "reset" or rest:lower() == "default" then
             db.spell = nil
-            Print("using class default: " .. (DefaultSpell() or "none found"))
+            Print("using class default: " .. (DefaultSpell() or "melee"))
             UpdateMacro(true)
         else
             db.spell = SpellKnown(rest) or rest
