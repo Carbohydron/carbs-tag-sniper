@@ -2,7 +2,7 @@
 ## Title: CarbsTagSniper
 ## Notes: Maintains a macro that targets a named quest mob so you can snipe its tag on respawn.
 ## Author: Carb
-## Version: 0.1.0
+## Version: 0.2.0
 ## SavedVariables: CarbsTagSniperDB
 
 CarbsTagSniper.lua

@@ -2,12 +2,9 @@
 
 A World of Warcraft: Forever addon that helps you snipe the tag on a named quest mob.
 
-CarbsTagSniper creates and maintains a macro that targets a named mob in the world, so when the
-mob respawns you can grab it with a single keypress before anyone else tags it.
-
-## Status
-
-Early scaffold. The macro management and respawn helpers are not implemented yet.
+CarbsTagSniper creates and maintains a character macro named `CTSnipe` that targets a named
+mob and hits it with an instant ability from your class, so when the mob respawns you can tag
+it before anyone else. Put the macro on a key or your mouse wheel and spam it.
 
 ## Installation
 
@@ -16,6 +13,46 @@ Copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the
 
 ## Usage
 
+1. Set the mob: `/cts target Rotting Dead`, or target it and type `/cts target`.
+2. Open `/macro`, Character Specific tab, and drag `CTSnipe` to an action bar.
+3. Bind it however you like (the addon never binds keys for you; mouse wheel works well).
+4. Spam it while you wait for the respawn.
+
 ```
-/cts            show help
+/cts                    help and current settings
+/cts target <mob name>  mob to snipe (no name = your current target)
+/cts spell <spell>      tag spell; /cts spell reset returns to the class default
+/cts mark <1-8|off>     raid marker for the mob (default 7, cross)
+/cts quiet <on|off>     mute error speech and error text while spamming (default on)
+/cts update             rebuild the macro now
+/cts show               print the macro text
 ```
+
+## The macro
+
+```
+#showtooltip
+/cleartarget
+/targetexact Rotting Dead
+/stopmacro [@target,noexists][@target,dead]
+/run CTSPre()
+/cast Fire Blast
+/startattack
+/run CTSPost()
+```
+
+- The target is cleared first, so if the mob isn't up (or is dead) the macro stops and does
+  nothing, instead of firing at whatever you had targeted before.
+- `CTSPre`/`CTSPost` turn error speech off around the cast and restore it, clear the red
+  error text, and set the raid marker only when it is missing, so spamming stays silent and
+  doesn't resend the marker every press.
+- The macro is only rewritten when its text actually changes, and never in combat (changes
+  wait for combat to end).
+
+Default tag spells, first one your character knows: Warrior Heroic Throw, Paladin Judgment,
+Hunter Arcane Shot, Rogue Shuriken Toss/Throw, Priest Shadow Word: Pain, Death Knight Death
+Coil, Shaman Flame Shock, Mage Fire Blast, Warlock Corruption, Monk Provoke, Druid Moonfire,
+Demon Hunter Throw Glaive, Evoker Azure Strike. Override with `/cts spell`.
+
+Errors the server reports after the cast (such as line of sight) arrive after speech is
+restored, so those can still make a sound.
