@@ -1,8 +1,8 @@
-# CarbsTagSniper
+# Carbs Tag Sniper
 
 A World of Warcraft: Forever addon that helps you snipe the tag on a named quest mob.
 
-CarbsTagSniper creates and maintains a character macro named `CTSnipe` that targets a named
+Carbs Tag Sniper creates and maintains a character macro named `CTSnipe` that targets a named
 mob and hits it with an instant ability from your class, so when the mob respawns you can tag
 it before anyone else. Put the macro on a key or your mouse wheel and spam it.
 
@@ -12,7 +12,7 @@ Install it from CurseForge or Wago Addons with your addon manager, or download t
 the GitHub release and extract it into `Interface/AddOns/`.
 
 For development, copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the path is
-`Interface/AddOns/CarbsTagSniper/CarbsTagSniper.toc`, then restart the game or `/reload`.
+`Interface/AddOns/Carbs-Tag-Sniper/Carbs-Tag-Sniper.toc`, then restart the game or `/reload`.
 
 ## Usage
 
@@ -69,7 +69,7 @@ restored, so those can still make a sound.
 
 Releases are built by the [BigWigs packager](https://github.com/BigWigsMods/packager) in
 `.github/workflows/release.yml`. Pushing a tag starting with `v` builds
-`CarbsTagSniper-<tag>-forever.zip`, stamps the tag into the `.toc` version, and uploads it to
+`Carbs-Tag-Sniper-<tag>-forever.zip`, stamps the tag into the `.toc` version, and uploads it to
 CurseForge, Wago Addons and a GitHub release. A tag containing `alpha` or `beta` is uploaded
 as an alpha or beta.
 

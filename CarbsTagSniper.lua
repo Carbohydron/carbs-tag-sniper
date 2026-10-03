@@ -31,7 +31,7 @@ local chardb   -- per character: tag method
 local pendingUpdate = false
 
 local function Print(msg)
-    DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99CarbsTagSniper|r: " .. msg)
+    DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99Carbs Tag Sniper|r: " .. msg)
 end
 
 local function SpellKnown(name)

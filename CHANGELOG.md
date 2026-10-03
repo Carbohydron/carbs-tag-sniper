@@ -1,4 +1,4 @@
-# CarbsTagSniper
+# Carbs Tag Sniper
 
 ## v1.0.0
 
