@@ -14,10 +14,10 @@ local CLASS_SPELLS = {
     PALADIN = { "Holy Shock", "Judgement" },
     HUNTER  = { "Arcane Shot", "Serpent Sting" },
     PRIEST  = { "Shadow Word: Pain", "Penance" },
-    SHAMAN  = { "Earth Shock", "Flame Shock", "Frost Shock" },
+    SHAMAN  = { "Earth Shock", "Flame Shock" },
     MAGE    = { "Fire Blast" },
     WARLOCK = { "Bane of Agony" },
-    DRUID   = { "Moonfire", "Insect Swarm" },
+    DRUID   = { "Moonfire" },
 }
 
 local defaults = {
