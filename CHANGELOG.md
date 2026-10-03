@@ -1,5 +1,9 @@
 # Carbs Tag Sniper
 
+## Unreleased
+
+- Druids no longer default to Insect Swarm and Shamans no longer default to Frost Shock.
+
 ## v1.0.0
 
 First public release for World of Warcraft: Forever.
