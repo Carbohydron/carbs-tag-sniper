@@ -8,7 +8,10 @@ it before anyone else. Put the macro on a key or your mouse wheel and spam it.
 
 ## Installation
 
-Copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the path is
+Install it from CurseForge or Wago Addons with your addon manager, or download the zip from
+the GitHub release and extract it into `Interface/AddOns/`.
+
+For development, copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the path is
 `Interface/AddOns/CarbsTagSniper/CarbsTagSniper.toc`, then restart the game or `/reload`.
 
 ## Usage
@@ -61,3 +64,21 @@ Insect Swarm. Warriors, Rogues, and anyone who hasn't learned one yet tag with m
 
 Errors the server reports after the cast (such as line of sight) arrive after speech is
 restored, so those can still make a sound.
+
+## Releasing
+
+Releases are built by the [BigWigs packager](https://github.com/BigWigsMods/packager) in
+`.github/workflows/release.yml`. Pushing a tag starting with `v` builds
+`CarbsTagSniper-<tag>-forever.zip`, stamps the tag into the `.toc` version, and uploads it to
+CurseForge, Wago Addons and a GitHub release. A tag containing `alpha` or `beta` is uploaded
+as an alpha or beta.
+
+1. Add the new version's notes to `CHANGELOG.md` and commit.
+2. `git tag -a v1.2.3 -m "v1.2.3"` then `git push origin v1.2.3`.
+
+Uploads need the `CF_API_KEY` and `WAGO_API_TOKEN` repository secrets and the
+`X-Curse-Project-ID` and `X-Wago-ID` lines in the `.toc`. A site without them is skipped.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
