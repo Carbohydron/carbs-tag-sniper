@@ -4,6 +4,8 @@
 ## Author: Carb
 ## Version: @project-version@
 ## X-License: MIT
+## X-Curse-Project-ID: 1723422
+## X-Wago-ID: 96EXyjNg
 ## SavedVariables: CarbsTagSniperDB
 ## SavedVariablesPerCharacter: CarbsTagSniperCharDB
 
