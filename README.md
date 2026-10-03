@@ -56,7 +56,7 @@ Copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the
 Default tag spells are instant and deal damage. The first one your character knows is used:
 Paladin Holy Shock or Judgement, Hunter Arcane Shot or Serpent Sting, Priest Shadow Word: Pain,
 Shaman Earth/Flame/Frost Shock, Mage Fire Blast, Warlock Bane of Agony, Druid Moonfire or
-Insect Swarm. Warriors, Rogues, and anyone who hasn't learned one yet tag with melee through
+Insect Swarm, Rogue Sinister Strike. Warriors and anyone who hasn't learned one yet tag with melee through
 `/startattack`. Override with `/cts spell`.
 
 Errors the server reports after the cast (such as line of sight) arrive after speech is

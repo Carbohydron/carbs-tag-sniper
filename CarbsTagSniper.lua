@@ -10,7 +10,7 @@ local DEFAULT_MARK = 7
 -- have not learned one yet) tag with melee via the macro's /startattack.
 local CLASS_SPELLS = {
     WARRIOR = {},
-    ROGUE   = {},
+    ROGUE   = { "Sinister Strike" },
     PALADIN = { "Holy Shock", "Judgement" },
     HUNTER  = { "Arcane Shot", "Serpent Sting" },
     PRIEST  = { "Shadow Word: Pain", "Penance" },
