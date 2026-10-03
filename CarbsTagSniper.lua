@@ -105,8 +105,8 @@ local function BuildBody(target, spell)
             out[#out + 1] = "/tm " .. db.mark
         end
         if db.quiet then out[#out + 1] = "/console Sound_EnableErrorSpeech 0" end
-        if spell then out[#out + 1] = "/cast " .. spell end
-        out[#out + 1] = "/startattack"
+        -- One tag line only: the spell, or melee when there is no spell.
+        out[#out + 1] = spell and ("/cast " .. spell) or "/startattack"
         if db.quiet then out[#out + 1] = "/run CTSPost()" end
         return table.concat(out, "\n")
     end

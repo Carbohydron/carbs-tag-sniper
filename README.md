@@ -40,7 +40,6 @@ Copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the
 /tm 7
 /console Sound_EnableErrorSpeech 0
 /cast Fire Blast
-/startattack
 /run CTSPost()
 ```
 
@@ -50,6 +49,8 @@ Copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the
   clears the red error text.
 - On Forever, `/run` code is always tainted ("ForceTaint_Strong"), so `/run` must never call a
   protected function such as `SetRaidTarget`. The raid mark uses the secure `/tm` command.
+- The macro has one tag line: `/cast` with your spell, or `/startattack` when you have no
+  spell (or chose `/cts spell attack`).
 - The macro is only rewritten when its text actually changes, and never in combat (changes
   wait for combat to end).
 
