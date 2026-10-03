@@ -21,7 +21,9 @@ Copy (or symlink) this folder into your WoW `Interface/AddOns/` directory so the
 ```
 /cts                    help and current settings
 /cts target <mob name>  mob to snipe (no name = your current target)
-/cts spell <spell>      tag spell; /cts spell reset returns to the class default
+/cts spell <spell>      tag spell for this character (saved per character)
+/cts spell attack       tag with melee (/startattack) instead of a spell
+/cts spell reset        go back to the class default
 /cts mark <1-8|off>     raid marker for the mob (default 7, cross)
 /cts quiet <on|off>     mute error speech and error text while spamming (default on)
 /cts update             rebuild the macro now

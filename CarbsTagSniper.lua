@@ -22,12 +22,12 @@ local CLASS_SPELLS = {
 
 local defaults = {
     target = nil,   -- mob name to snipe
-    spell = nil,    -- manual spell override; nil means use the class table
     mark = DEFAULT_MARK, -- raid marker index 1-8, or 0 for none
     quiet = true,   -- mute error speech and clear the red error text while casting
 }
 
-local db
+local db       -- account-wide: mob, mark, quiet
+local chardb   -- per character: tag method
 local pendingUpdate = false
 
 local function Print(msg)
@@ -59,8 +59,13 @@ local function DefaultSpell()
     return nil
 end
 
+-- The tag method is saved per character in CarbsTagSniperCharDB.tag:
+-- nil = class default, ATTACK = melee only, anything else = that spell.
+local ATTACK = "ATTACK"
+
 local function CurrentSpell()
-    return db.spell or DefaultSpell()
+    if chardb.tag == ATTACK then return nil end
+    return chardb.tag or DefaultSpell()
 end
 
 local function GetCV(name)
@@ -155,7 +160,7 @@ local function UpdateMacro(verbose)
         end
         Print("created character macro " .. MACRO_NAME .. ". Drag it from /macro to a bar or bind it.")
     end
-    if not spell then
+    if not spell and chardb.tag ~= ATTACK then
         Print("no instant tag spell yet, so the macro tags with melee (/startattack). Set a spell with /cts spell <name>.")
     end
 end
@@ -164,7 +169,7 @@ local function Status()
     Print(("mob: %s | spell: %s%s | mark: %s | quiet: %s"):format(
         db.target or "|cffff6060not set|r",
         CurrentSpell() or "melee",
-        db.spell and " (manual)" or " (class default)",
+        chardb.tag and " (this character)" or " (class default)",
         (db.mark and db.mark > 0) and tostring(db.mark) or "off",
         db.quiet and "on" or "off"))
 end
@@ -172,7 +177,7 @@ end
 local function Help()
     Print("commands:")
     Print("  /cts target <mob name>  set the mob to snipe (no name = your current target)")
-    Print("  /cts spell <spell name> set the tag spell (/cts spell reset = class default)")
+    Print("  /cts spell <spell name> tag spell for this character (attack = melee, reset = class default)")
     Print("  /cts mark <1-8|off>     raid marker to put on the mob")
     Print("  /cts quiet <on|off>     mute error speech/text while spamming")
     Print("  /cts update             rebuild the macro now")
@@ -193,6 +198,9 @@ frame:SetScript("OnEvent", function(self, event, arg1)
         for k, v in pairs(defaults) do
             if db[k] == nil then db[k] = v end
         end
+        db.spell = nil -- moved to the per-character tag setting
+        CarbsTagSniperCharDB = CarbsTagSniperCharDB or {}
+        chardb = CarbsTagSniperCharDB
         speechPref = GetCV("Sound_EnableErrorSpeech") or "1"
         self:UnregisterEvent("ADDON_LOADED")
     elseif not db then
@@ -223,14 +231,20 @@ SlashCmdList["CARBSTAGSNIPER"] = function(msg)
         UpdateMacro(true)
     elseif cmd == "spell" then
         if rest == "" then
-            Print("spell: " .. (CurrentSpell() or "none"))
+            Print("tagging with: " .. (CurrentSpell() or "melee (/startattack)"))
         elseif rest:lower() == "reset" or rest:lower() == "default" then
-            db.spell = nil
+            chardb.tag = nil
             Print("using class default: " .. (DefaultSpell() or "melee"))
             UpdateMacro(true)
+        elseif rest:lower() == "attack" or rest:lower() == "melee" then
+            chardb.tag = ATTACK
+            Print("tagging with melee (/startattack) on this character.")
+            UpdateMacro(true)
         else
-            db.spell = SpellKnown(rest) or rest
-            if not SpellKnown(rest) then Print("note: " .. rest .. " does not look like a spell you know; using it anyway.") end
+            local known = SpellKnown(rest)
+            chardb.tag = known or rest
+            Print("tagging with " .. chardb.tag .. " on this character.")
+            if not known then Print("note: " .. rest .. " does not look like a spell you know; using it anyway.") end
             UpdateMacro(true)
         end
     elseif cmd == "mark" then
