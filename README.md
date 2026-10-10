@@ -66,10 +66,6 @@ Rogue Sinister Strike. Warriors and anyone who hasn't learned one yet tag with m
 Errors the server reports after the cast (such as line of sight) arrive after speech is
 restored, so those can still make a sound.
 
-## Developer docs
-
-- [Releasing](docs/developer/releasing.md)
-
 ## License
 
 MIT, see [LICENSE](LICENSE).
