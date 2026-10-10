@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Shows a map icon next to the addon in the in-game AddOns list.
 - Paladins now default to Holy Strike instead of Holy Shock.
 - Druids no longer default to Insect Swarm and Shamans no longer default to Frost Shock.
 
