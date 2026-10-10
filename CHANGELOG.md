@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Paladins now default to Holy Strike instead of Holy Shock.
 - Druids no longer default to Insect Swarm and Shamans no longer default to Frost Shock.
 
 ## v1.0.0

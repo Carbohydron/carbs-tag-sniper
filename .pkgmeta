@@ -3,3 +3,6 @@ package-as: Carbs-Tag-Sniper
 manual-changelog:
   filename: CHANGELOG.md
   markup-type: markdown
+
+ignore:
+  - docs
