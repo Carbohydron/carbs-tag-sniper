@@ -1,6 +1,6 @@
 # Carbs Tag Sniper
 
-## Unreleased
+## v1.0.1
 
 - Shows a map icon next to the addon in the in-game AddOns list.
 - Paladins now default to Holy Strike instead of Holy Shock.
