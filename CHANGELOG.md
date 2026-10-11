@@ -1,6 +1,6 @@
 # Carbs Tag Sniper
 
-## Unreleased
+## v1.1.0
 
 - Warriors who know Bloodrage and Hamstring now cast Bloodrage, then Hamstring, to tag.
 - The macro clears a dead target instead of leaving the corpse selected.
