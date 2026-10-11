@@ -5,11 +5,12 @@ local MACRO_ICON = "INV_MISC_QUESTIONMARK" -- lets #showtooltip pick the spell's
 local MACRO_MAX_CHARS = 255
 local DEFAULT_MARK = 7
 
--- Instant, damaging abilities that tag a mob. The first one the character
--- knows wins; /cts spell overrides this. Classes with none (or characters that
--- have not learned one yet) tag with melee via the macro's /startattack.
+-- Instant, damaging abilities that tag a mob. The first entry the character
+-- knows wins; a nested table is a sequence cast in one press, used only once
+-- every spell in it is known. /cts spell overrides this. Characters with no
+-- known entry tag with melee via the macro's /startattack.
 local CLASS_SPELLS = {
-    WARRIOR = {},
+    WARRIOR = { { "Bloodrage", "Hamstring" } },
     ROGUE   = { "Sinister Strike" },
     PALADIN = { "Holy Strike", "Judgement" },
     HUNTER  = { "Arcane Shot", "Serpent Sting" },
@@ -50,10 +51,16 @@ local function SpellKnown(name)
     return nil
 end
 
+-- Returns the class default as a list of spell names, or nil for melee.
 local function DefaultSpell()
     local _, class = UnitClass("player")
-    for _, name in ipairs(CLASS_SPELLS[class] or {}) do
-        local known = SpellKnown(name)
+    for _, entry in ipairs(CLASS_SPELLS[class] or {}) do
+        local names = type(entry) == "table" and entry or { entry }
+        local known = {}
+        for i, name in ipairs(names) do
+            known[i] = SpellKnown(name)
+            if not known[i] then known = nil break end
+        end
         if known then return known end
     end
     return nil
@@ -63,9 +70,15 @@ end
 -- nil = class default, ATTACK = melee only, anything else = that spell.
 local ATTACK = "ATTACK"
 
+-- The spells the macro casts, in order, or nil for melee.
 local function CurrentSpell()
     if chardb.tag == ATTACK then return nil end
-    return chardb.tag or DefaultSpell()
+    if chardb.tag then return { chardb.tag } end
+    return DefaultSpell()
+end
+
+local function SpellLabel(spells)
+    return spells and table.concat(spells, " + ") or nil
 end
 
 local function GetCV(name)
@@ -91,22 +104,28 @@ end
 
 -- Builds the macro text. Optional lines are dropped
 -- (#showtooltip first, then the raid mark) if long names pass the 255 char cap.
-local function BuildBody(target, spell)
+local function BuildBody(target, spells)
     local function lines(withTooltip, withMark)
         local out = {}
         if withTooltip then out[#out + 1] = "#showtooltip" end
         -- Clear first so a stale target can never be hit when the mob is not up.
         out[#out + 1] = "/cleartarget"
         out[#out + 1] = "/targetexact " .. target
-        out[#out + 1] = "/stopmacro [noexists][dead]"
+        -- /targetexact can pick up the corpse, so never leave a dead target behind.
+        out[#out + 1] = "/cleartarget [dead]"
+        out[#out + 1] = "/stopmacro [noexists]"
         if withMark and db.mark and db.mark > 0 then
             -- /run is force-tainted on Forever (no loadstring_untainted), so the
             -- protected SetRaidTarget must go through the secure /tm command.
             out[#out + 1] = "/tm " .. db.mark
         end
         if db.quiet then out[#out + 1] = "/console Sound_EnableErrorSpeech 0" end
-        -- One tag line only: the spell, or melee when there is no spell.
-        out[#out + 1] = spell and ("/cast " .. spell) or "/startattack"
+        -- Tag with the spells, or melee when there are none; never both.
+        if spells then
+            for _, name in ipairs(spells) do out[#out + 1] = "/cast " .. name end
+        else
+            out[#out + 1] = "/startattack"
+        end
         if db.quiet then out[#out + 1] = "/run CTSPost()" end
         return table.concat(out, "\n")
     end
@@ -135,8 +154,8 @@ local function UpdateMacro(verbose)
     end
     pendingUpdate = false
 
-    local spell = CurrentSpell()
-    local body = BuildBody(db.target, spell)
+    local spells = CurrentSpell()
+    local body = BuildBody(db.target, spells)
     if not body then
         Print("mob and spell names are too long to fit in a macro (255 characters).")
         return
@@ -160,7 +179,7 @@ local function UpdateMacro(verbose)
         end
         Print("created character macro " .. MACRO_NAME .. ". Drag it from /macro to a bar or bind it.")
     end
-    if not spell and chardb.tag ~= ATTACK then
+    if not spells and chardb.tag ~= ATTACK then
         Print("no instant tag spell yet, so the macro tags with melee (/startattack). Set a spell with /cts spell <name>.")
     end
 end
@@ -168,7 +187,7 @@ end
 local function Status()
     Print(("mob: %s | spell: %s%s | mark: %s | quiet: %s"):format(
         db.target or "|cffff6060not set|r",
-        CurrentSpell() or "melee",
+        SpellLabel(CurrentSpell()) or "melee",
         chardb.tag and " (this character)" or " (class default)",
         (db.mark and db.mark > 0) and tostring(db.mark) or "off",
         db.quiet and "on" or "off"))
@@ -231,10 +250,10 @@ SlashCmdList["CARBSTAGSNIPER"] = function(msg)
         UpdateMacro(true)
     elseif cmd == "spell" then
         if rest == "" then
-            Print("tagging with: " .. (CurrentSpell() or "melee (/startattack)"))
+            Print("tagging with: " .. (SpellLabel(CurrentSpell()) or "melee (/startattack)"))
         elseif rest:lower() == "reset" or rest:lower() == "default" then
             chardb.tag = nil
-            Print("using class default: " .. (DefaultSpell() or "melee"))
+            Print("using class default: " .. (SpellLabel(DefaultSpell()) or "melee"))
             UpdateMacro(true)
         elseif rest:lower() == "attack" or rest:lower() == "melee" then
             chardb.tag = ATTACK

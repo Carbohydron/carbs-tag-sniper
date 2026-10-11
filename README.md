@@ -39,29 +39,31 @@ For development, copy (or symlink) this folder into your WoW `Interface/AddOns/`
 #showtooltip
 /cleartarget
 /targetexact Rotting Dead
-/stopmacro [noexists][dead]
+/cleartarget [dead]
+/stopmacro [noexists]
 /tm 7
 /console Sound_EnableErrorSpeech 0
 /cast Fire Blast
 /run CTSPost()
 ```
 
-- The target is cleared first, so if the mob isn't up (or is dead) the macro stops and does
-  nothing, instead of firing at whatever you had targeted before.
+- The target is cleared first, so if the mob isn't up the macro stops and does nothing,
+  instead of firing at whatever you had targeted before. A dead mob is cleared too, so you
+  are never left targeting a corpse.
 - Error speech is muted with `/console` before the cast; `CTSPost` restores your setting and
   clears the red error text.
 - On Forever, `/run` code is always tainted ("ForceTaint_Strong"), so `/run` must never call a
   protected function such as `SetRaidTarget`. The raid mark uses the secure `/tm` command.
-- The macro has one tag line: `/cast` with your spell, or `/startattack` when you have no
-  spell (or chose `/cts spell attack`).
+- The macro tags with `/cast` lines for your spells, or `/startattack` when you have no
+  spell (or chose `/cts spell attack`), never both.
 - The macro is only rewritten when its text actually changes, and never in combat (changes
   wait for combat to end).
 
 Default tag spells are instant and deal damage. The first one your character knows is used:
 Paladin Holy Strike or Judgement, Hunter Arcane Shot or Serpent Sting, Priest Shadow Word: Pain,
 Shaman Earth Shock or Flame Shock, Mage Fire Blast, Warlock Bane of Agony, Druid Moonfire,
-Rogue Sinister Strike. Warriors and anyone who hasn't learned one yet tag with melee through
-`/startattack`. Override with `/cts spell`.
+Rogue Sinister Strike, Warrior Bloodrage then Hamstring (once both are learned). Anyone who
+hasn't learned theirs yet tags with melee through `/startattack`. Override with `/cts spell`.
 
 Errors the server reports after the cast (such as line of sight) arrive after speech is
 restored, so those can still make a sound.
